@@ -29,21 +29,24 @@ def classify0(inX, dataSet, labels, k):
     实际上不需要将inX复制成相同数量的array，直接相减即可，得到的值就是by coordinate计算的
     '''
     dist = np.sum((inX-dataSet)**2,axis=1)**0.5 #输出的值是[1,2,3,4]分别对应着输入值与相应的基准的距离
+    '''
     sortedDistIndicies = dist.argsort() #按照dist这个list中的值从小到大排列，分别给出相应的顺序，例如[2,4,1,3]则结果是[2,0,3,1]
     for i in sortedDistIndicies[:k]:
 	    votelabel = [labels[i]]
-    '''
         classcount = {}    
 	for i in range(k): #dataset共有4个数则k一定要小于4，否则无法判断
         #'numpy.ndarray' the object is not callable	
 	votelabel = labels[sortedDistIndicies(i)] #会得到一个list，['B','A','B']     
 	classcount[votelabel] = classcount.get(votelabel,0)+1 #会得到一个dictionary{'B':2 ;'A':1 },.get('B',0)意味着取‘B’的值，如果值不存在则输出0
+    '''
+    votelabel = [labels[index] for index in dist.argsort()[0 : k]]
+    '''
     sortedclasscount = sorted(classcount.items(),key = operater.itemgetter(1), reverse = True) #将dictionary的item取出来,以dict的形式储存，py3中没有iteritems这个attribute，按照dictionary的内容进行排序
     return sortedclasscount[0][0]    
     我们可以利用collections里的counter函数进行统计 
     '''
     label = collections.Counter(votelabel).most_common(1)[0][0] #按照votelabel的多少进行计数，并按照从大到小排列，格式为dict，most_common(1)只输出一个
-	  return label 
+    return label 
 
 if __name__ == '__main__':
 	#创建数据集
