@@ -69,4 +69,12 @@ def plot(dataset, labels):
 	axs[0][0].legend(handles=[didntLike,smallDoses,largeDoses])
 	axs[0][1].legend(handles=[didntLike,smallDoses,largeDoses])
 	axs[1][0].legend(handles=[didntLike,smallDoses,largeDoses])
-	plt.show()		
+	plt.show()	
+								  
+#normalization 返回归一化后的矩阵，极差，最小值
+def normaldata(dataset):
+	min_data = dataset.min(0)	
+	max_data = dataset.max(0)
+	ranges = max_data - min_data
+	normeddata = (dataset - min_data)/ranges
+	return normeddata, ranges, min_data
