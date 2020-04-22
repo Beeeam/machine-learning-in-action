@@ -78,3 +78,35 @@ def normaldata(dataset):
 	ranges = max_data - min_data
 	normeddata = (dataset - min_data)/ranges
 	return normeddata, ranges, min_data
+
+#分类器测试函数 取数据集中10%作为测试集 验证正确率
+def datingclasstest():
+	ratio = 0.1 #取前10%作为验证集inX
+	datingdata, datinglabels = file2matrix('datingTestSet.txt')
+	normed, ranges, min_data = normaldata(datingdata)
+	m = normed.shape[0] 
+	num = int(m * ratio)
+	error = 0
+	for i in range(num) :
+		result = classify0(normed[i,:], normed[num:m, :],datinglabels[num:m], 4)#m-num项是训练集，即dataset以及labels
+		print('the result is: %d, the answer is: %d' % (result, datinglabels[i]))
+		if result != datinglabels[i]:
+			error += 1
+	print('the total error rate is: %f' %(error/float(num)))
+                                  
+#给一个人分类
+def classifyperson():
+	resultlist = ['do not', 'a little bit','very']
+	pliotdist = float(input('frequent flier miles earned per year:'))
+	gametime = float(input('percent of time spent playing video game:'))
+	ice = float(input('liters of ice cream consumed per year:'))
+	testdata = np.array([pliotdist, gametime, ice])
+	datingdata, datinglabels = file2matrix('datingTestSet.txt')
+	normeddata, ranges, min_data = normaldata(datingdata)
+	normedtest = (testdata-min_data)/ranges #书上没有normalized这个数据，但这个方法有问题如果testdata小于mindata会出现负值
+	reslut = classify0(normedtest, normeddata, datinglabels, 4)
+	print('you will probably %s like this person.' %(resultlist[reslut-1]))
+								  
+if __name__ == '__main__':
+	datingclasstest()
+	classifyperson()
