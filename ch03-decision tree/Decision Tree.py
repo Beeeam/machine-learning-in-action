@@ -73,7 +73,7 @@ def bestfeat(dataset):
 				bestfeature = i
 		return beatfeature
 '''
-统计结果标签中最多的 'yes' 'no'哪个多就分类哪个
+统计结果标签中最多的 'yes' 'no'哪个多就分类哪个,返回的是类别
 '''
 def classcount(classlist):
 	count = {}
@@ -82,6 +82,24 @@ def classcount(classlist):
 			count[i] = 0
 		count[i] += 1
 	sortedcount = sort(count.items(),key=operator.itemgetter(1), reverse = True)
-	return sortedcount
+	return sortedcount[0][0]
 '''
-创建决策树，得到决策树{'house holding': {0: {'employed': {0: 'no', 1: 'yes'}}, 1: 'yes'}}'''
+创建决策树，得到决策树{'house holding': {0: {'employed': {0: 'no', 1: 'yes'}}, 1: 'yes'}}
+'''
+def createtree(dataset, feats):
+    classlist =[example[-1] for example in dataset]
+    if len(set(classlist)) == 1:#当所有的标签‘yes’ or ‘no’都相同时，返回这个标签
+        return classlist[0]
+    if len(dataset[0]) == 1:#当被删的只剩一个的时候（所有特征都被用完了），返回最多的标签
+        return classcount(classlist)
+    best = bestfeat(dataset)
+    featname = feats[best]
+    tree = {featname:{}}
+    del(feats[best])
+    val = [value[best] for value in dataset]
+    uniqval = set(val)
+    for i in uniqval:
+        subset = datasplit(dataset, best, i)
+        subfeats = feats[:]#保留原有的featurename 不被修改
+        tree[featname][i] = createtree(subset, subfeats)
+    return tree	
