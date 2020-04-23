@@ -1,5 +1,5 @@
 import math
-
+import operator
 #计算数据集的entropy，分别统计数据集中所有的类别的概率，代入信息熵公式
 import math
 def entropy(dataset):
@@ -47,8 +47,41 @@ def datasplit(dataset, i, value):
 			newdata.append(newfeatvec)
 	return newdata
 		
-	
-	
-	
-	
-	
+'''
+每个节点是一个特征，一个特征有多个值，如果标签更多地集中在一个值，这个标签的熵越小，infogain越大，则说明这个特征能更好地反应这个标签
+需要遍历每一个特征，并对特征中所有的值求熵
+寻找最好的特征
+'''
+def bestfeat(dataset):
+	featnum = len(dataset[0])-1
+	baseent = entropy(dataset)
+	bestinfogain = 0
+	bestfeature = 0
+	for featvec in dataset:
+		for i in range(featnum):
+			#统计有多少个值,set函数是把一个list/dict/tuple中重复元素去掉
+			featlist = [example[i] for example in dataset]
+			uniqval = set(featlist)
+			newent = 0
+			for value in uniqval:
+				subdata = datasplit(dataset, i, value)
+				prob = len(subdata)/float(len(dataset))
+				newent += prob*entropy(subdata)
+			infogain = baseent - newent
+			if (infogain > bestinfogain):
+				bestinfogain = infogain
+				bestfeature = i
+		return beatfeature
+'''
+统计结果标签中最多的 'yes' 'no'哪个多就分类哪个
+'''
+def classcount(classlist):
+	count = {}
+	for i in classlist:
+		if i not in count.keys():
+			count[i] = 0
+		count[i] += 1
+	sortedcount = sort(count.items(),key=operator.itemgetter(1), reverse = True)
+	return sortedcount
+'''
+创建决策树，得到决策树{'house holding': {0: {'employed': {0: 'no', 1: 'yes'}}, 1: 'yes'}}'''
