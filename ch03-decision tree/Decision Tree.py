@@ -1,5 +1,6 @@
 import math
 import operator
+import pickle
 #计算数据集的entropy，分别统计数据集中所有的类别的概率，代入信息熵公式
 import math
 def entropy(dataset):
@@ -103,3 +104,53 @@ def createtree(dataset, feats):
         subfeats = feats[:]#保留原有的featurename 不被修改
         tree[featname][i] = createtree(subset, subfeats)
     return tree	
+'''
+testvec需要分类的features inputtree 决策树 labels 特征标签
+从bestfeatures的值开始判断 如果不是最佳的继续分类
+'''
+def classify(inputtree, labels):
+    testvec = []
+    for i in range(len(labels)-1):
+        vec = input('%s:' %labels[i])
+        testvec.extend(vec)
+    def clas(inputtree, labels, testvec):
+        firststr = next(iter(inputtree.keys()))#树中第一个feature，即best feature
+        seconddict = inputtree[firststr]#第二个tree{0: {'employed': {0: 'no', 1: 'yes'}}, 1: 'yes'}
+        labelindex = labels.index(firststr)#feature在labels的index
+        key = int(testvec[labelindex])#相应feature在testvec中的值作为键
+        dictval = seconddict[key]#取相应键的值
+        if isinstance(dictval, dict):
+            result = clas(dictval, labels, testvec)
+        else:
+            result = dictval
+		return result
+    return clas(inputtree, labels, testvec)			
+"""
+函数说明:存储决策树
+Parameters:
+	inputTree - 已经生成的决策树
+	filename - 决策树的存储文件名
+""" 
+def storeTree(inputTree, filename):
+	with open(filename, 'wb') as fw:
+		pickle.dump(inputTree, fw)
+
+"""
+函数说明:读取决策树
+Parameters:
+	filename - 决策树的存储文件名
+Returns:
+	pickle.load(fr) - 决策树字典
+""" 
+def grabTree(filename):
+	fr = open(filename, 'rb')
+	return pickle.load(fr)        
+
+if __name__ == '__main__':
+    dataset,labels = createDataSet()
+    tree = createtree(dataset, labels)
+    dataset,labels = createDataSet()
+    test=[1,0,1]
+    print(dataset)
+    print(labels)
+    print(classify(tree, labels))
