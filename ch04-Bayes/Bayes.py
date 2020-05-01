@@ -112,3 +112,22 @@ def classify(test, p0Vec, p1Vec, pabusive):
         return 1
     else: 
         return 0
+
+if __name__ == '__main__':
+    postingList,classVec = loadDataSet()
+    vocabularyList = createlist(postingList)
+    print ("the vocabulary list is:\n",vocabularyList)
+    returnVec = setofwords2vec(vocabularyList,postingList[0])
+    print ("post0 vector=\n",returnVec)
+    trainVec = []
+    for post in postingList:
+        trainVec.append(setofwords2vec(vocabularyList,post))
+    print("all post vector are:\n",trainVec)
+    p0Vect,p1Vect,p1 = naivebayes0(trainVec,classVec)
+    p0,p1,pa =naivebayes1(trainVec,classVec)
+    test0 = ['love', 'my', 'dalmation']
+    testVec0 = setofwords2vec(vocabularyList, test0)
+    print (test0,'classified as: ',classify(testVec0,p0,p1,pa))
+    test1 = ['stupid', 'garbage']
+    testVec1 = setofwords2vec(vocabularyList, test1)
+    print (test1,'classified as: ',classify(testVec1,p0,p1,pa))
