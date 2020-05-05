@@ -15,11 +15,11 @@ def loadDataSet():
 将dataset中的词汇提出做成wordlist，不重复
 '''
 def createlist(dataset):
-    wordlist = []
+    vocablist = []
 	for word in dataset:
-		if word not in wordlist:
-			wordlist.extend(word)
-	return wordlist
+		if word not in vocablist:
+			vocablist.extend(word)
+	return vocablist
 
 '''
 根据inputset将vocablist向量化，在inputset中的记为1，否则记为0
@@ -123,7 +123,7 @@ if __name__ == '__main__':
     for post in postingList:
         trainVec.append(setofwords2vec(vocabularyList,post))
     print("all post vector are:\n",trainVec)
-    p0Vect,p1Vect,p1 = naivebayes0(trainVec,classVec)
+    p0Vect,p1Vect,pab = naivebayes0(trainVec,classVec)
     p0,p1,pa =naivebayes1(trainVec,classVec)
     test0 = ['love', 'my', 'dalmation']
     testVec0 = setofwords2vec(vocabularyList, test0)
@@ -137,10 +137,46 @@ import re
 函数说明:接收一个大字符串并将其解析为字符串列表,小写单词
 '''
 def textparse(bigstring):
-  	text = re.split(r'\W',bigstring) ##将特殊符号作为切分标志进行字符串切分，即非字母、非数字https://docs.python.org/3/library/re.html
+  	text = re.split(r'\W+',bigstring) ##将特殊符号作为切分标志进行字符串切分，即非字母、非数字https://docs.python.org/3/library/re.html
   	return [words.lower() for words in text if len(words) > 2]   #除了单个字母，例如大写的I，其它单词变成小写
 '''
 函数说明:测试朴素贝叶斯分类器
 过滤垃圾邮件
+步骤1:数据准备
+将ham和spam里的邮件分别读出来，标记，生成vocablist和classvec,要用到的函数有textparse（bigstring）（切割单词），createlist（dataset）
+步骤2:划分数据集
+取任意40个邮件作为训练集，10个作为测试集，使用random任意生成
+步骤3:生成矩阵
+使用函数setofwords2vec(vocablist, inputset)，其中inputset需要遍历每一封邮件
+步骤4:计算概率
+步骤5:统计错误率
 '''
+
+import random
 def spamTest():
+    wordlist=[];classvec=[]
+    for i in range(1,26):
+        word = textparse(open('email/spam/%d.txt' % i,errors='ignore').read())
+        wordlist.append(word)
+        classvec.append(1)
+        word = textparse(open('email/ham/%d.txt' % i,errors='ignore').read())
+        wordlist.append(word)
+        classvec.append(0)
+    vocablist = createlist(wordlist)
+    trainindex = list(range(50)); testindex=[]
+    for i in range(10):
+        testi=int(random.uniform(0,len(trainindex)))
+        testindex.append(testi)  		
+        del(trainindex[testi])
+    trainmat=[];traincat=[]
+    for itrain in trainindex:
+        trainmat.append(setofwords2vec(vocablist, wordlist[itrain]))
+        traincat.append(classvec[itrain])
+    p0,p1,pa = naivebayes1(trainmat, traincat)
+    error = 0
+    for itest in testindex:
+        testvec = setofwords2vec(vocablist, wordlist[itest])	  	
+        if classify(testvec, p0, p1, pa) != classvec[itest]:
+            error+=1
+            print("classification error",wordlist[itest])
+    print ('the error rate is: ',float(error)/len(testindex))
