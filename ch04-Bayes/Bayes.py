@@ -131,3 +131,16 @@ if __name__ == '__main__':
     test1 = ['stupid', 'garbage']
     testVec1 = setofwords2vec(vocabularyList, test1)
     print (test1,'classified as: ',classify(testVec1,p0,p1,pa))
+			      
+import re			      
+'''
+函数说明:接收一个大字符串并将其解析为字符串列表,小写单词
+'''
+def textparse(bigstring):
+  	text = re.split(r'\W',bigstring) ##将特殊符号作为切分标志进行字符串切分，即非字母、非数字https://docs.python.org/3/library/re.html
+  	return [words.lower() for words in text if len(words) > 2]   #除了单个字母，例如大写的I，其它单词变成小写
+'''
+函数说明:测试朴素贝叶斯分类器
+过滤垃圾邮件
+'''
+def spamTest():
