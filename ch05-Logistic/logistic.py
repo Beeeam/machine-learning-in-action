@@ -70,3 +70,44 @@ def sga(data,label):
             weight = weight + learn_rate  *  datamat[randinx].transpose() *error
             del(dataindex[randinx])                                
     return weight.getA()
+'''
+绘图，看收敛情况，reference：https://github.com/TingNie/Machine-learning-in-action/blob/master/logistic/logistic.ipynb
+'''
+def sga(data,label):
+    datamat = np.mat(data)
+    labelmat = np.mat(label).transpose()#1行m列
+    m,n = datamat.shape
+    weight = np.ones((n,1))
+    iters = 200
+    weight0=[];weight1=[];weight2=[]
+    for i in range(iters):
+        dataindex = list(range(m))
+        for j in range(m):
+            learn_rate = 4/(i+j+1)+0.01
+            randinx = int(random.uniform(0,len(dataindex)))
+            out = sigmoid(datamat[randinx]*weight)
+            error = labelmat[randinx] - out
+            weight = weight + learn_rate  *  datamat[randinx].transpose() *error
+            weight0.append(weight[0,0])
+            weight1.append(weight[1,0])
+            weight2.append(weight[2,0])
+            del(dataindex[randinx])  
+    return weight.getA(), weight0, weight1, weight2
+if __name__ == '__main__':
+    datamat,labelmat = loaddata('testSet.txt')
+    print(datamat[0])
+    weight,weight0,weight1,weight2=sga(datamat,labelmat)
+    print(weight)
+    plt.subplot(311)
+    plt.plot(weight0,"b")
+    plt.ylabel("w0")
+
+    plt.subplot(312)
+    plt.plot(weight1,"r")
+    plt.ylabel("w1")
+
+    plt.subplot(313)
+    plt.plot(weight2,"y")
+    plt.ylabel("w2")
+    plt.xlabel("iters")
+    plt.show()
