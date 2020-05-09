@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 def loaddata(filename):
 	datamat=[];labelmat=[]
 	fr = open(filename)
@@ -8,4 +9,6 @@ def loaddata(filename):
 		datamat.append(linearr[:m-1])
 		labelmat.append(linearr[-1])
 	return np.array(datamat,dtype=np.float64),np.(labelmat,dtype=np.int)
+
+
 		
